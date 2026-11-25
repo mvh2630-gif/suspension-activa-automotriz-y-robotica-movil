@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Suspensión Activa Automotriz y Robótica Móvil | ELEC-5308</title>
+  <style>
+    :root {
+      --bg: #fffdf2;
+      --surface: #fef9c3;
+      --soft: #fef08a;
+      --text: #000000;
+      --primary: #9d174d;
+      --border: #9d174d;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+    }
+    header {
+      background: var(--surface);
+      border-bottom: 2px solid var(--border);
+      padding: 1.4rem 1.5rem;
+    }
+    .header-inner {
+      max-width: 1040px;
+      margin: 0 auto;
+    }
+    .tag {
+      display: inline-block;
+      background: #ffffff;
+      color: var(--primary);
+      border: 1.5px solid var(--border);
+      font-weight: 700;
+      font-size: 0.82rem;
+      padding: 0.2rem 0.65rem;
+      border-radius: 999px;
+      margin-bottom: 0.4rem;
+    }
+    header h1 { margin: 0; font-size: 1.5rem; color: var(--primary); }
+    header p { margin: 0.25rem 0 0.9rem; color: var(--text); font-size: 0.92rem; }
+    nav { display: flex; flex-wrap: wrap; gap: 0.45rem; }
+    nav a {
+      text-decoration: none;
+      color: var(--text);
+      background: #ffffff;
+      border: 1.5px solid var(--border);
+      padding: 0.35rem 0.8rem;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      font-weight: 600;
+    }
+    nav a:hover { background: var(--primary); color: #ffffff; }
+    main { max-width: 1040px; margin: 1.6rem auto; padding: 0 1rem 3rem; }
+    section {
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: 14px;
+      padding: 1.6rem;
+      margin-bottom: 1.5rem;
+    }
+    h2, h3 {
+      margin-top: 0;
+      color: var(--primary);
+    }
+    h2 {
+      font-size: 1.22rem;
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 0.45rem;
+    }
+    .cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 1.1rem; }
+    .panel {
+      background: var(--soft);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem 1.1rem;
+      color: var(--text);
+    }
+    .math-step {
+      background: #ffffff;
+      border: 1.5px solid var(--border);
+      border-left: 5px solid var(--primary);
+      color: var(--text);
+      padding: 0.8rem 1rem;
+      margin: 0.8rem 0;
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: 0.9rem;
+      overflow-x: auto;
+    }
+    label { display: flex; justify-content: space-between; margin-top: 0.7rem; font-size: 0.9rem; font-weight: 700; color: var(--text); }
+    input[type="range"] { width: 100%; accent-color: var(--primary); cursor: pointer; }
+    pre {
+      background: #ffffff;
+      color: var(--text);
+      border: 1.5px solid var(--border);
+      padding: 1rem;
+      border-radius: 10px;
+      overflow-x: auto;
+      font-size: 0.85rem;
+    }
+    img { max-width: 100%; border-radius: 10px; border: 1.5px solid var(--border); margin-top: 0.5rem; display: block; }
+    svg { width: 100%; max-width: 720px; height: auto; display: block; margin: 1rem auto; }
+    canvas#graficaStep {
+      width: 100%;
+      height: 290px;
+      background: #ffffff;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      display: block;
+    }
+    .leyenda {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-top: 0.6rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .leyenda span { display: inline-flex; align-items: center; gap: 0.4rem; }
+    .linea-la { width: 22px; height: 0; border-top: 2.5px dashed #9d174d; display: inline-block; }
+    .linea-lc { width: 22px; height: 2.5px; background: #000000; display: inline-block; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <span class="tag">ELEC-5308 · Análisis de Sistemas · Tema 3</span>
+      <h1>Suspensión Activa Automotriz y Robótica Móvil</h1>
+      <p>Estudiante: María José Arguedas Castro · Universidad Hispanoamericana</p>
+      <nav>
+        <a href="#sec1">1. Contexto y Control</a>
+        <a href="#sec2">2. Modelado Matemático</a>
+        <a href="#sec3">3. Espacio de Estados</a>
+        <a href="#sec4">4. Simulador y Octave</a>
+        <a href="#sec5">5. Estabilidad y Conclusiones</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section id="sec1">
+      <h2>1. Contexto Automotriz, Robótica Móvil y Arquitectura de Control</h2>
+      <p>Los sistemas de <strong>suspensión activa</strong> se aplican tanto en ingeniería automotriz (vehículos ligeros, prototipos y tren de rodaje) como en robótica móvil (plataformas terrestres que transitan por superficies irregulares). A diferencia de una suspensión pasiva con rigidez y amortiguamiento fijos, una suspensión activa incorpora un actuador capaz de entregar fuerza controlada para mejorar el confort, la estabilidad y el aislamiento frente a irregularidades del camino o del piso.</p>
+      <div class="cols">
+        <div class="panel">
+          <strong>Elementos del Sistema de Control:</strong>
+          <ul>
+            <li><strong>Planta:</strong> Masa suspendida del chasis (m), resorte elástico (k_s) y amortiguador viscoso (b_s).</li>
+            <li><strong>Actuador:</strong> Dispositivo que genera la fuerza de control f_a(t) entre el chasis y la base/rueda.</li>
+            <li><strong>Sensores:</strong> Medición de desplazamiento vertical y(t) y velocidad vertical ẏ(t) para realimentación.</li>
+            <li><strong>Controlador:</strong> Ley de control con ganancia proporcional K_p para ajustar la respuesta dinámica.</li>
+          </ul>
+        </div>
+        <div class="panel">
+          <strong>Perturbaciones Físicas:</strong>
+          <ul>
+            <li>Perfil del camino, baches o desniveles representados por w(t) y su derivada ẇ(t).</li>
+            <li>Cambios en la carga transportada o variaciones en los parámetros físicos del sistema.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="sec2">
+      <h2>2. Modelado Matemático Físico Paso a Paso</h2>
+      <p>Aplicando la <strong>Segunda Ley de Newton</strong> sobre la masa suspendida en el eje vertical y(t), considerando comportamiento lineal de resorte y amortiguador:</p>
+      <div class="math-step">
+        ΣF_y = m·ÿ(t)<br/>
+        f_a(t) - k_s·[y(t) - w(t)] - b_s·[ẏ(t) - ẇ(t)] = m·ÿ(t)
+      </div>
+      <p>Reordenando términos para dejar la dinámica de salida a la izquierda y las acciones/perturbaciones a la derecha:</p>
+      <div class="math-step">
+        m·ÿ(t) + b_s·ẏ(t) + k_s·y(t) = f_a(t) + b_s·ẇ(t) + k_s·w(t)
+      </div>
+      <p>Tomando la entrada de control u(t) = f_a(t) (con w(t) = 0 y condiciones iniciales nulas), aplicamos la <strong>Transformada de Laplace</strong>:</p>
+      <div class="math-step">
+        (m·s² + b_s·s + k_s)·Y(s) = F_a(s)<br/>
+        G(s) = Y(s) / F_a(s) = 1 / (m·s² + b_s·s + k_s)
+      </div>
+    </section>
+
+    <section id="sec3">
+      <h2>3. Espacio de Estados, Integradores s⁻¹ y Conversión Matricial</h2>
+      <p>Definiendo los estados x₁(t) = y(t) (posición vertical) y x₂(t) = ẏ(t) (velocidad vertical):</p>
+      <div class="math-step">
+        ẋ₁(t) = x₂(t)<br/>
+        ẋ₂(t) = -(k_s/m)·x₁(t) - (b_s/m)·x₂(t) + (1/m)·u(t)<br/><br/>
+        A = [  0       1    ]     B = [  0  ]     C = [ 1  0 ]     D = [ 0 ]<br/>
+            [ -k_s/m  -b_s/m]         [ 1/m ]
+      </div>
+      <p><strong>Conversión matricial G(s) = C(sI - A)⁻¹B + D:</strong></p>
+      <div class="math-step">
+        sI - A = [   s       -1     ]   ⇒   det(sI - A) = s² + (b_s/m)s + (k_s/m)<br/>
+                 [ k_s/m   s + b_s/m]<br/><br/>
+        G(s) = [1  0] · (1 / det(sI - A)) · [ s + b_s/m   1 ] · [  0  ] + 0 = 1 / (m·s² + b_s·s + k_s)<br/>
+                                            [  -k_s/m     s ]   [ 1/m ]
+      </div>
+
+      <svg viewBox="0 0 720 210" aria-label="Diagrama de estados con integradores">
+        <rect x="20" y="65" width="75" height="40" rx="6" fill="#fef08a" stroke="#9d174d" stroke-width="2"/>
+        <text x="57" y="90" text-anchor="middle" font-size="14" font-weight="bold" fill="#000000">1 / m</text>
+        <circle cx="145" cy="85" r="14" fill="#ffffff" stroke="#9d174d" stroke-width="2"/>
+        <text x="145" y="90" text-anchor="middle" font-size="16" font-weight="bold" fill="#000000">+</text>
+        <rect x="210" y="65" width="85" height="40" rx="6" fill="#9d174d"/>
+        <text x="252" y="90" text-anchor="middle" font-size="15" font-weight="bold" fill="#ffffff">s⁻¹</text>
+        <rect x="370" y="65" width="85" height="40" rx="6" fill="#9d174d"/>
+        <text x="412" y="90" text-anchor="middle" font-size="15" font-weight="bold" fill="#ffffff">s⁻¹</text>
+        <line x1="95" y1="85" x2="131" y2="85" stroke="#000000" stroke-width="2"/>
+        <line x1="159" y1="85" x2="210" y2="85" stroke="#000000" stroke-width="2"/>
+        <line x1="295" y1="85" x2="370" y2="85" stroke="#000000" stroke-width="2"/>
+        <line x1="455" y1="85" x2="540" y2="85" stroke="#000000" stroke-width="2"/>
+        <text x="184" y="75" text-anchor="middle" font-size="12" fill="#000000">ẋ₂</text>
+        <text x="332" y="75" text-anchor="middle" font-size="12" fill="#000000">x₂ = ẏ</text>
+        <text x="505" y="75" text-anchor="middle" font-size="12" fill="#000000">x₁ = y(t)</text>
+        <polyline points="332,85 332,140 280,140" fill="none" stroke="#9d174d" stroke-width="2"/>
+        <rect x="200" y="123" width="80" height="32" rx="6" fill="#fef08a" stroke="#9d174d" stroke-width="2"/>
+        <text x="240" y="144" text-anchor="middle" font-size="12" font-weight="bold" fill="#000000">-b_s / m</text>
+        <polyline points="200,140 145,140 145,99" fill="none" stroke="#9d174d" stroke-width="2"/>
+        <polyline points="485,85 485,185 280,185" fill="none" stroke="#9d174d" stroke-width="2"/>
+        <rect x="200" y="168" width="80" height="32" rx="6" fill="#fef08a" stroke="#9d174d" stroke-width="2"/>
+        <text x="240" y="189" text-anchor="middle" font-size="12" font-weight="bold" fill="#000000">-k_s / m</text>
+        <polyline points="200,185 135,185 135,96" fill="none" stroke="#9d174d" stroke-width="2"/>
+      </svg>
+    </section>
+
+    <section id="sec4">
+      <h2>4. Simulador Web Interactivo + Validación en GNU Octave</h2>
+      <div class="cols">
+        <div class="panel">
+          <h3>Parámetros del Sistema</h3>
+          <label><span>Masa suspendida m (kg)</span><span id="valM">45</span></label>
+          <input id="sliderM" type="range" min="20" max="120" step="5" value="45" />
+
+          <label><span>Rigidez resorte k_s (N/m)</span><span id="valKs">3200</span></label>
+          <input id="sliderKs" type="range" min="1000" max="8000" step="100" value="3200" />
+
+          <label><span>Amortiguamiento b_s (N·s/m)</span><span id="valBs">240</span></label>
+          <input id="sliderBs" type="range" min="50" max="800" step="10" value="240" />
+
+          <label><span>Ganancia Lazo Cerrado K_p</span><span id="valKp">4500</span></label>
+          <input id="sliderKp" type="range" min="500" max="15000" step="250" value="4500" />
+
+          <div id="infoMetricas" style="margin-top:1rem; font-size:0.9rem;"></div>
+        </div>
+        <div class="panel">
+          <canvas id="graficaStep" width="460" height="290"></canvas>
+          <div class="leyenda">
+            <span><i class="linea-la"></i> Lazo Abierto y_LA(t) [m]</span>
+            <span><i class="linea-lc"></i> Lazo Cerrado y_LC(t) [m]</span>
+          </div>
+        </div>
+      </div>
+
+      <h3 style="margin-top:1.3rem;">Script Oficial en GNU Octave</h3>
+      <pre>% Limpia variables, consola y gráficas anteriores
+clear; clc; close all;
+pkg load control;
+
+% Parámetros físicos de suspensión activa (aplicable a vehículos ligeros y robótica móvil)
+m = 45;
+ks = 3200;
+bs = 240;
+Kp = 4500;
+
+% Matrices del modelo en espacio de estados: x1 = y(t), x2 = dy/dt
+A = [0, 1; -ks/m, -bs/m];
+B = [0; 1/m];
+C = [1, 0];
+D = 0;
+
+% Función de transferencia G(s) = C*(sI - A)^(-1)*B + D y lazo cerrado con ganancia Kp
+s = tf('s');
+G_la = C * inv(s*eye(2) - A) * B + D;
+T_lc = feedback(Kp * G_la, 1);
+
+% Polos y valores finales en estado estacionario
+disp('Polos Lazo Abierto (eig(A)):');
+disp(eig(A));
+
+disp('Polos Lazo Cerrado (pole(T_lc)):');
+disp(pole(T_lc));
+
+fprintf('Valor final LA: %.6e m | LC: %.6e m\n', dcgain(G_la), dcgain(T_lc));
+
+% Respuesta al escalón en el intervalo de 0 a 2 s (igual al simulador web)
+t = 0:0.005:2;
+plot(t, step(G_la, t), 'm--', t, step(T_lc, t), 'k-', 'LineWidth', 1.8);
+grid on;
+title('Respuesta al Escalón - Suspensión Activa (Automotriz y Robótica Móvil)');
+xlabel('Tiempo (s)');
+ylabel('Desplazamiento vertical y(t) (m)');
+legend('Lazo Abierto y_{LA}(t)', sprintf('Lazo Cerrado y_{LC}(t) (K_p=%d)', Kp), 'Location', 'southeast');</pre>
+
+      <div class="cols">
+        <div class="panel">
+          <strong>Captura 1: Gráfica comparativa en GNU Octave</strong>
+          <img src="grafica_escalon.png" alt="Gráfica generada en GNU Octave" />
+        </div>
+        <div class="panel">
+          <strong>Captura 2: Polos y valores finales en consola</strong>
+          <img src="consola_octave.png" alt="Consola de GNU Octave" />
+        </div>
+      </div>
+    </section>
+
+    <section id="sec5">
+      <h2>5. Análisis de Estabilidad y Conclusiones de Ingeniería</h2>
+      <p>Con los parámetros nominales (m = 45 kg, k_s = 3200 N/m, b_s = 240 N·s/m), los valores propios de A en lazo abierto son <strong>s₁,₂ = -2.67 ± 8.00j</strong>. Al ubicarse en el semiplano izquierdo, el sistema es asintóticamente estable y presenta respuesta subamortiguada.</p>
+      <p>Al cerrar el lazo con <strong>K_p = 4500</strong>, los polos se ubican en <strong>s₁,₂ = -2.67 ± 12.81j</strong>: cambia la frecuencia natural y la dinámica de respuesta, y el valor final ante escalón pasa de <code>3.125 × 10⁻⁴ m</code> en lazo abierto a <code>0.584 m</code> en lazo cerrado, evidenciando el efecto de la acción proporcional sobre el comportamiento del sistema.</p>
+    </section>
+  </main>
+
+  <script>
+    const sM = document.getElementById('sliderM');
+    const sKs = document.getElementById('sliderKs');
+    const sBs = document.getElementById('sliderBs');
+    const sKp = document.getElementById('sliderKp');
+    const canvas = document.getElementById('graficaStep');
+    const ctx = canvas.getContext('2d');
+
+    function simular(num0, a2, a1, a0, dt = 0.005, tMax = 2) {
+      const b1 = a1 / a2, b0 = a0 / a2, u = num0 / a2;
+      let y = 0, dy = 0;
+      const times = [], values = [];
+      for (let t = 0; t <= tMax + 1e-9; t += dt) {
+        times.push(t);
+        values.push(y);
+        const ddy = u - b1 * dy - b0 * y;
+        dy += ddy * dt;
+        y += dy * dt;
+      }
+      return { times, values };
+    }
+
+    function polos(a2, a1, a0) {
+      const b = a1 / a2, c = a0 / a2, d = b * b - 4 * c;
+      if (d >= 0) return `${((-b + Math.sqrt(d)) / 2).toFixed(2)}, ${((-b - Math.sqrt(d)) / 2).toFixed(2)}`;
+      return `${(-b / 2).toFixed(2)} ± ${(Math.sqrt(-d) / 2).toFixed(2)}j`;
+    }
+
+    function dibujarGrafica(times, laVals, lcVals, tMax = 2) {
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+      const cssW = rect.width || 460;
+      const cssH = rect.height || 290;
+      canvas.width = Math.round(cssW * dpr);
+      canvas.height = Math.round(cssH * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, cssW, cssH);
+
+      const padL = 48, padR = 16, padT = 18, padB = 34;
+      const plotW = Math.max(10, cssW - padL - padR);
+      const plotH = Math.max(10, cssH - padT - padB);
+
+      let maxVal = 0.1;
+      for (let i = 0; i < lcVals.length; i++) {
+        if (Math.abs(lcVals[i]) > maxVal) maxVal = Math.abs(lcVals[i]);
+        if (Math.abs(laVals[i]) > maxVal) maxVal = Math.abs(laVals[i]);
+      }
+      const yMax = maxVal * 1.15;
+      const yMin = -yMax * 0.12;
+
+      const xPos = (t) => padL + (t / tMax) * plotW;
+      const yPos = (v) => padT + ((yMax - v) / (yMax - yMin)) * plotH;
+
+      ctx.strokeStyle = '#e5e7eb';
+      ctx.lineWidth = 1;
+      ctx.font = '11px Segoe UI, sans-serif';
+      ctx.fillStyle = '#000000';
+
+      for (let i = 0; i <= 4; i++) {
+        const yVal = yMin + (i / 4) * (yMax - yMin);
+        const py = yPos(yVal);
+        ctx.beginPath();
+        ctx.moveTo(padL, py);
+        ctx.lineTo(padL + plotW, py);
+        ctx.stroke();
+        ctx.fillText(yVal.toFixed(2), 6, py + 4);
+      }
+
+      for (let i = 0; i <= 4; i++) {
+        const tVal = (i / 4) * tMax;
+        const px = xPos(tVal);
+        ctx.beginPath();
+        ctx.moveTo(px, padT);
+        ctx.lineTo(px, padT + plotH);
+        ctx.stroke();
+        ctx.fillText(tVal.toFixed(1) + 's', px - 10, cssH - 10);
+      }
+
+      ctx.strokeStyle = '#000000';
+      ctx.lineWidth = 1.2;
+      ctx.strokeRect(padL, padT, plotW, plotH);
+
+      ctx.save();
+      ctx.strokeStyle = '#9d174d';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([6, 4]);
+      ctx.beginPath();
+      times.forEach((t, idx) => {
+        const px = xPos(t), py = yPos(laVals[idx]);
+        if (idx === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+      });
+      ctx.stroke();
+      ctx.restore();
+
+      ctx.strokeStyle = '#000000';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      times.forEach((t, idx) => {
+        const px = xPos(t), py = yPos(lcVals[idx]);
+        if (idx === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+      });
+      ctx.stroke();
+    }
+
+    function actualizar() {
+      const m = +sM.value, ks = +sKs.value, bs = +sBs.value, kp = +sKp.value;
+      document.getElementById('valM').textContent = m;
+      document.getElementById('valKs').textContent = ks;
+      document.getElementById('valBs').textContent = bs;
+      document.getElementById('valKp').textContent = kp;
+
+      const la = simular(1, m, bs, ks);
+      const lc = simular(kp, m, bs, ks + kp);
+
+      document.getElementById('infoMetricas').innerHTML = `
+        <strong>Polos Lazo Abierto:</strong> ${polos(m, bs, ks)}<br/>
+        <strong>Polos Lazo Cerrado:</strong> ${polos(m, bs, ks + kp)}<br/>
+        <strong>Valor final LA:</strong> ${(1 / ks).toExponential(3)} m<br/>
+        <strong>Valor final LC:</strong> ${(kp / (ks + kp)).toExponential(3)} m
+      `;
+
+      dibujarGrafica(la.times, la.values, lc.values, 2);
+    }
+
+    [sM, sKs, sBs, sKp].forEach(el => el.addEventListener('input', actualizar));
+    window.addEventListener('resize', actualizar);
+    actualizar();
+  </script>
+</body>
+</html>
